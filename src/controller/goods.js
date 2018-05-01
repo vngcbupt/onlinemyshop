@@ -34,7 +34,7 @@ module.exports = class extends Base {
     const gallery = await this.model('goods_gallery').where({goods_id: goodsId}).limit(4).select();
     const attribute = await this.model('goods_attribute').field('nideshop_goods_attribute.value, nideshop_attribute.name').join('nideshop_attribute ON nideshop_goods_attribute.attribute_id=nideshop_attribute.id').order({'nideshop_goods_attribute.id': 'asc'}).where({'nideshop_goods_attribute.goods_id': goodsId}).select();
     const issue = await this.model('goods_issue').select();
-    const brand = await this.model('brand').where({id: info.brand_id}).find();
+    // const brand = await this.model('brand').where({id: info.brand_id}).find();
     const commentCount = await this.model('comment').where({value_id: goodsId, type_id: 0}).count();
     const hotComment = await this.model('comment').where({value_id: goodsId, type_id: 0}).find();
     let commentInfo = {};
@@ -68,7 +68,7 @@ module.exports = class extends Base {
       userHasCollect: userHasCollect,
       issue: issue,
       comment: comment,
-      brand: brand,
+      // brand: brand,
       specificationList: await model.getSpecificationList(goodsId),
       productList: await model.getProductList(goodsId)
     });

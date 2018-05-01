@@ -7,7 +7,12 @@ module.exports = class extends Base {
    * @return {Promise} []
    */
   async listAction() {
-    const orderList = await this.model('order').where({ user_id: think.userId }).page(1, 10).countSelect();
+    const ordertype = parseInt(this.get('ordertype'));
+    let orderList = null;
+    if(ordertype)
+       orderList = await this.model('order').where({ user_id: think.userId, order_status:ordertype }).page(1, 10).countSelect();
+    else
+       orderList = await this.model('order').where({ user_id: think.userId }).page(1, 10).countSelect();
     const newOrderList = [];
     for (const item of orderList.data) {
       // 订单的商品
@@ -125,13 +130,14 @@ module.exports = class extends Base {
       postscript: this.post('postscript'),
 
       // 使用的优惠券
-      coupon_id: 0,
+      coupon_id: 1,
       coupon_price: couponPrice,
 
       add_time: currentTime,
       goods_price: goodsTotalPrice,
       order_price: orderTotalPrice,
-      actual_price: actualPrice
+      actual_price: actualPrice,
+      order_status:1
     };
 
     // 开启事务，插入订单信息和订单商品
@@ -155,7 +161,7 @@ module.exports = class extends Base {
         retail_price: goodsItem.retail_price,
         number: goodsItem.number,
         goods_specifition_name_value: goodsItem.goods_specifition_name_value,
-        goods_specifition_ids: goodsItem.goods_specifition_ids
+        goods_specifition_ids: goodsItem.goods_specifition_ids,
       });
     }
 

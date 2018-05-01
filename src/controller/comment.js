@@ -16,10 +16,12 @@ module.exports = class extends Base {
     const valueId = this.post('valueId');
     const content = this.post('content');
     const buffer = Buffer.from(content);
+    console.log(content);
     const insertId = await this.model('comment').add({
       type_id: typeId,
       value_id: valueId,
-      content: buffer.toString('base64'),
+      content: content,
+      // content: buffer.toString('base64'),
       add_time: this.getTime(),
       user_id: this.getLoginUserId()
     });
@@ -79,7 +81,8 @@ module.exports = class extends Base {
     const commentList = [];
     for (const commentItem of comments.data) {
       const comment = {};
-      comment.content = Buffer.from(commentItem.content, 'base64').toString();
+      // comment.content = Buffer.from(commentItem.content, 'base64').toString();
+      comment.content = commentItem.content;
       comment.type_id = commentItem.type_id;
       comment.value_id = commentItem.value_id;
       comment.id = commentItem.id;

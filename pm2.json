@@ -1,10 +1,10 @@
 {
   "apps": [{
-    "name": "onlinemyshop",
+    "name": "myshop_server",
     "script": "production.js",
-    "cwd": "/shopserver/onlinemyshop",
+    "cwd": "C:\Users\lulifeng\Desktop\wechat_try\myshop_server",
     "exec_mode": "fork",
-    "max_memory_restart": "256M",
+    "max_memory_restart": "1G",
     "autorestart": true,
     "node_args": [],
     "args": [],

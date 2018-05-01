@@ -57,7 +57,10 @@ module.exports = class extends think.Service {
         notify_url: think.config('weixin.notify_url'),
         trade_type: 'JSAPI'
       }, (res) => {
+        console.log(res)
+        console.log("77777")
         if (res.return_code === 'SUCCESS' && res.result_code === 'SUCCESS') {
+         
           const returnParams = {
             'appid': res.appid,
             'timeStamp': parseInt(Date.now() / 1000) + '',

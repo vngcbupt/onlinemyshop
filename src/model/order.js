@@ -29,41 +29,25 @@ module.exports = class extends think.Model {
 
     const orderInfo = await this.where({id: orderId}).find();
 
-    // 订单流程：下单成功－》支付订单－》发货－》收货－》评论
-    // 订单相关状态字段设计，采用单个字段表示全部的订单状态
-    // 1xx表示订单取消和删除等状态 0订单创建成功等待付款，101订单已取消，102订单已删除
-    // 2xx表示订单支付状态,201订单已付款，等待发货
-    // 3xx表示订单物流相关状态,300订单已发货，301用户确认收货
-    // 4xx表示订单退换货相关的状态,401没有发货，退款402,已收货，退款退货
-    // 如果订单已经取消或是已完成，则可删除和再次购买
-    if (orderInfo.order_status === 101) {
-      handleOption.delete = true;
-      handleOption.buy = true;
-    }
-
-    // 如果订单没有被取消，且没有支付，则可支付，可取消
-    if (orderInfo.order_status === 0) {
-      handleOption.cancel = true;
+    // 如果订单待付款
+    if (orderInfo.order_status === 1) {
       handleOption.pay = true;
-    }
-
-    // 如果订单已付款，没有发货，则可退款操作
-    if (orderInfo.order_status === 201) {
-      handleOption.return = true;
-    }
-
-    // 如果订单已经发货，没有收货，则可收货操作和退款、退货操作
-    if (orderInfo.order_status === 300) {
       handleOption.cancel = true;
-      handleOption.pay = true;
-      handleOption.return = true;
     }
 
-    // 如果订单已经支付，且已经收货，则可完成交易、评论和再次购买
-    if (orderInfo.order_status === 301) {
-      handleOption.delete = true;
+    // 如果订单待收货
+    if (orderInfo.order_status === 2) {
+      handleOption.delivery = true;
+    }
+
+    // 如果订单待评价
+    if (orderInfo.order_status === 3) {
       handleOption.comment = true;
-      handleOption.buy = true;
+    }
+
+    // 如果订单待售后
+    if (orderInfo.order_status === 4) {
+      handleOption.return = true;
     }
 
     return handleOption;
@@ -71,10 +55,19 @@ module.exports = class extends think.Model {
 
   async getOrderStatusText(orderId) {
     const orderInfo = await this.where({id: orderId}).find();
-    let statusText = '未付款';
+    let statusText = '待付款';
     switch (orderInfo.order_status) {
-      case 0:
-        statusText = '未付款';
+      case 1:
+        statusText = '待付款';
+        break;
+      case 2:
+        statusText = '待收货';
+        break;
+      case 3:
+        statusText = '待评价';
+        break;
+      case 4:
+        statusText = '退款/售后';
         break;
     }
 
@@ -88,7 +81,7 @@ module.exports = class extends think.Model {
    * @returns {Promise.<boolean>}
    */
   async updatePayStatus(orderId, payStatus = 0) {
-    return this.where({id: orderId}).limit(1).update({pay_status: parseInt(payStatus)});
+    return this.where({id: orderId}).limit(1).update({pay_status:(payStatus)});
   }
 
   /**
@@ -97,9 +90,9 @@ module.exports = class extends think.Model {
    * @returns {Promise.<Promise|Promise<any>|T|*>}
    */
   async getOrderByOrderSn(orderSn) {
-    if (think.isEmpty(orderSn)) {
-      return {};
-    }
+    // if (think.isEmpty(orderSn)) {
+    //   return {};
+    // }
     return this.where({order_sn: orderSn}).find();
   }
 };
